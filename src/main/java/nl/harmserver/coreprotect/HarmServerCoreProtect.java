@@ -13,8 +13,12 @@ public class HarmServerCoreProtect extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        // Config aanmaken als die nog niet bestaat
+        saveDefaultConfig();
+
         // Listeners registreren
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockLogger(), this);
 
         // Commands registreren
         getCommand("inspect").setExecutor(new InspectCommand());
