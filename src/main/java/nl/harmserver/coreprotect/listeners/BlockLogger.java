@@ -10,10 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +26,9 @@ public class BlockLogger implements Listener {
             dataFolder.mkdirs();
         }
         logFile = new File(dataFolder, "blocklogs.txt");
+
+        // Bij plugin start: laad bestaande logs
+        loadFromFile();
     }
 
     @EventHandler
@@ -55,6 +55,37 @@ public class BlockLogger implements Listener {
             writer.newLine();
         } catch (IOException e) {
             HarmServerCoreProtect.getInstance().getLogger().warning("Kon log niet wegschrijven: " + e.getMessage());
+        }
+    }
+
+    private void loadFromFile() {
+        if (!logFile.exists()) return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(logFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Formaat: player;action;blockType;world,x,y,z;time
+                String[] parts = line.split(";");
+                if (parts.length == 5) {
+                    String player = parts[0];
+                    String action = parts[1];
+                    Material blockType = Material.matchMaterial(parts[2]);
+
+                    String[] locParts = parts[3].split(",");
+                    String world = locParts[0];
+                    int x = Integer.parseInt(locParts[1]);
+                    int y = Integer.parseInt(locParts[2]);
+                    int z = Integer.parseInt(locParts[3]);
+
+                    Location location = HarmServerCoreProtect.getInstance().getServer().getWorld(world).getBlockAt(x, y, z).getLocation();
+                    long time = Long.parseLong(parts[4]);
+
+                    logs.add(new LogEntry(player, action, blockType, location, time));
+                }
+            }
+            HarmServerCoreProtect.getInstance().getLogger().info("Block logs geladen: " + logs.size() + " entries.");
+        } catch (IOException e) {
+            HarmServerCoreProtect.getInstance().getLogger().warning("Kon logs niet laden: " + e.getMessage());
         }
     }
 
