@@ -1,13 +1,13 @@
 package nl.harmserver.coreprotect.commands;
 
+import nl.harmserver.coreprotect.listeners.BlockLogger;
+import nl.harmserver.coreprotect.listeners.BlockLogger.LogEntry;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import nl.harmserver.coreprotect.listeners.BlockLogger;
 
 public class RollbackCommand implements CommandExecutor {
 
@@ -21,20 +21,25 @@ public class RollbackCommand implements CommandExecutor {
         String targetPlayer = args[0];
         int count = 0;
 
-        for (BlockLogger.LogEntry entry : BlockLogger.logs) {
-            if (entry == null || entry.location == null) {
-                continue;
-            }
-            if (entry.player != null && entry.player.equalsIgnoreCase(targetPlayer) && "PLACE".equals(entry.action)) {
-                Block block = entry.location.getBlock(); // nooit null
+        for (LogEntry entry : BlockLogger.logs) {
+            if (entry != null && entry.player.equalsIgnoreCase(targetPlayer) && "PLACE".equals(entry.action)) {
+                Block block = entry.location.getBlock();
                 block.setType(Material.AIR);
                 count++;
             }
         }
 
-        sender.sendMessage(ChatColor.GREEN + "Rollback uitgevoerd voor speler "
-                + ChatColor.YELLOW + targetPlayer
-                + ChatColor.GRAY + ". (" + count + " blokken verwijderd)");
+        if (count > 0) {
+            sender.sendMessage(ChatColor.GREEN + "[Rollback] " +
+                    ChatColor.YELLOW + targetPlayer +
+                    ChatColor.GRAY + " → " +
+                    ChatColor.GOLD + count +
+                    ChatColor.GRAY + " blokken verwijderd.");
+        } else {
+            sender.sendMessage(ChatColor.GRAY + "[Rollback] Geen blokken gevonden voor speler " +
+                    ChatColor.YELLOW + targetPlayer);
+        }
+
         return true;
     }
 }
