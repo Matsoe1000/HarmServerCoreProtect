@@ -1,0 +1,8 @@
+nl\harmserver\coreprotect\utils\Utils.class
+nl\harmserver\coreprotect\listeners\BlockLogger.class
+nl\harmserver\coreprotect\HarmServerCoreProtect.class
+nl\harmserver\coreprotect\listeners\PlayerListener.class
+nl\harmserver\coreprotect\commands\InspectCommand.class
+nl\harmserver\coreprotect\commands\RollbackCommand.class
+nl\harmserver\coreprotect\listeners\BlockLogger$LogEntry.class
+nl\harmserver\coreprotect\managers\PluginManager.class

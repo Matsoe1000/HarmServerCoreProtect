@@ -1,0 +1,13 @@
+name: HarmServerCoreProtect
+main: nl.harmserver.coreprotect.HarmServerCoreProtect
+version: 1.0.0
+api-version: 1.21
+author: Mats
+
+commands:
+  inspect:
+    description: Inspecteer een blok
+    usage: /inspect
+  rollback:
+    description: Rollback blokken van een speler
+    usage: /rollback <speler>
