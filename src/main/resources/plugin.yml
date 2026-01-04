@@ -1,6 +1,6 @@
 name: HarmServerCoreProtect
 main: nl.harmserver.coreprotect.HarmServerCoreProtect
-version: 1.0.0
+version: 1.1.0
 api-version: 1.21
 author: Mats
 
@@ -8,6 +8,24 @@ commands:
   inspect:
     description: Inspecteer een blok
     usage: /inspect
+    permission: harmserver.inspect
+
   rollback:
     description: Rollback blokken van een speler
     usage: /rollback <speler>
+    permission: harmserver.rollback
+
+  rollbacktime:
+    description: Rollback blokken van een speler binnen X minuten
+    usage: /rollbacktime <speler> <minuten>
+    permission: harmserver.rollback
+
+  inspectplayer:
+    description: Toon alle acties van een speler
+    usage: /inspectplayer <speler>
+    permission: harmserver.inspect
+
+  coreprotectreload:
+    description: Herlaad configuratie en logs
+    usage: /coreprotectreload
+    permission: harmserver.admin
