@@ -1,39 +1,37 @@
 package nl.harmserver.coreprotect;
 
-import org.bukkit.command.PluginCommand;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import nl.harmserver.coreprotect.commands.InspectCommand;
-import nl.harmserver.coreprotect.commands.RollbackCommand;
+import nl.harmserver.coreprotect.commands.*;
 import nl.harmserver.coreprotect.listeners.BlockLogger;
+import nl.harmserver.coreprotect.listeners.PlayerListener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class HarmServerCoreProtect extends JavaPlugin {
 
+    private static HarmServerCoreProtect instance;
+
     @Override
     public void onEnable() {
-        getLogger().info("HarmServerCoreProtect plugin ingeschakeld!");
+        instance = this;
 
-        // Events
-        getServer().getPluginManager().registerEvents(new BlockLogger(), this);
+        // Listeners registreren
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-        // Commands met expliciete variabele + null-check
-        PluginCommand inspectCmd = getCommand("inspect");
-        if (inspectCmd != null) {
-            inspectCmd.setExecutor(new InspectCommand());
-        } else {
-            getLogger().severe("Command 'inspect' ontbreekt in plugin.yml!");
-        }
+        // Commands registreren
+        getCommand("inspect").setExecutor(new InspectCommand());
+        getCommand("rollback").setExecutor(new RollbackCommand());
+        getCommand("rollbacktime").setExecutor(new RollbackTimeCommand());
+        getCommand("inspectplayer").setExecutor(new InspectPlayerCommand());
+        getCommand("coreprotectreload").setExecutor(new ReloadCommand());
 
-        PluginCommand rollbackCmd = getCommand("rollback");
-        if (rollbackCmd != null) {
-            rollbackCmd.setExecutor(new RollbackCommand());
-        } else {
-            getLogger().severe("Command 'rollback' ontbreekt in plugin.yml!");
-        }
+        getLogger().info("HarmServerCoreProtect is succesvol ingeschakeld!");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("HarmServerCoreProtect plugin uitgeschakeld!");
+        getLogger().info("HarmServerCoreProtect is uitgeschakeld.");
+    }
+
+    public static HarmServerCoreProtect getInstance() {
+        return instance;
     }
 }
