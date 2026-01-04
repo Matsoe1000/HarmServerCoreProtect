@@ -1,64 +1,57 @@
 package nl.harmserver.coreprotect.commands;
 
+import nl.harmserver.coreprotect.listeners.BlockLogger;
+import nl.harmserver.coreprotect.listeners.BlockLogger.LogEntry;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import nl.harmserver.coreprotect.listeners.BlockLogger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class InspectCommand implements CommandExecutor {
 
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        // Defensieve null-check om IDE-hints te elimineren
-        if (sender == null) {
-            return true;
-        }
-
         if (!(sender instanceof Player)) {
-            String msg = ChatColor.RED + "Alleen spelers kunnen dit commando gebruiken.";
-            sender.sendMessage(msg);
+            sender.sendMessage(ChatColor.RED + "Alleen spelers kunnen dit command gebruiken.");
             return true;
         }
 
         Player player = (Player) sender;
+        Block targetBlock = player.getTargetBlockExact(10); // blok waar speler naar kijkt, max 10 blokken afstand
 
-        Block target = player.getTargetBlockExact(5);
-        if (target == null) {
-            player.sendMessage(ChatColor.RED + "Geen blok geselecteerd.");
+        if (targetBlock == null || targetBlock.getType() == Material.AIR) {
+            player.sendMessage(ChatColor.RED + "Je kijkt niet naar een geldig blok.");
             return true;
         }
 
-        Location targetLoc = target.getLocation();
+        Location loc = targetBlock.getLocation();
         boolean found = false;
 
-        for (BlockLogger.LogEntry entry : BlockLogger.logs) {
-            if (entry == null || entry.location == null) {
-                continue;
-            }
-            if (entry.location.equals(targetLoc)) {
-                String who = entry.player != null ? entry.player : "Onbekend";
-                String act = entry.action != null ? entry.action : "UNKNOWN";
-                String type = entry.blockType != null ? entry.blockType : "UNKNOWN";
-
-                player.sendMessage(
-                    ChatColor.YELLOW + who
-                    + ChatColor.GRAY + " heeft dit blok "
-                    + ChatColor.AQUA + act
-                    + ChatColor.GRAY + " (" + type + ")"
-                    + ChatColor.GRAY + " op tijdstip "
-                    + ChatColor.WHITE + entry.time
-                );
+        for (LogEntry entry : BlockLogger.logs) {
+            if (entry != null && entry.location.equals(loc)) {
                 found = true;
+                String timeFormatted = dateFormat.format(new Date(entry.time));
+                player.sendMessage(ChatColor.YELLOW + "[Inspect] " +
+                        ChatColor.AQUA + entry.player +
+                        ChatColor.GRAY + " heeft " +
+                        ChatColor.GOLD + entry.action +
+                        ChatColor.GRAY + " gedaan op " +
+                        ChatColor.GREEN + entry.blockType.name() +
+                        ChatColor.GRAY + " (" + timeFormatted + ")");
             }
         }
 
         if (!found) {
-            player.sendMessage(ChatColor.GRAY + "Geen log gevonden voor dit blok.");
+            player.sendMessage(ChatColor.GRAY + "[Inspect] Geen log gevonden voor dit blok.");
         }
 
         return true;
