@@ -1,0 +1,18 @@
+# HarmServerCoreProtect Config
+
+# Standaard rollback tijd (in minuten) als geen waarde wordt opgegeven
+default-rollback-time: 30
+
+# Max radius voor rollback acties
+max-rollback-radius: 50
+
+# Kleuren voor berichten (kan aangepast worden)
+colors:
+  success: GREEN
+  warning: YELLOW
+  error: RED
+
+# Logging instellingen
+logging:
+  save-to-file: true
+  log-file-name: blocklogs.txt
